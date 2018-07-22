@@ -3,7 +3,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 import os
-import sqlite3
+# import sqlite3
 import random
 from label_db import LabelDB
 import re
@@ -37,7 +37,7 @@ class LabelUI():
     root.bind('N', self.display_next_unlabelled_image)
     print("N   next image with 0 labels")
     self.canvas = tk.Canvas(root, cursor='tcross')
-    self.canvas.config(width=768, height=1024)
+    self.canvas.config(width=1024, height=768)
     self.canvas.bind('<Button-1>', self.add_bee_event)  # left mouse button
     self.canvas.bind('<Button-3>', self.remove_closest_bee_event)  # right mouse button
     self.canvas.pack()
@@ -143,6 +143,7 @@ class LabelUI():
     img_name = self.files[self.file_idx]
     # Display image (with filename added)
     img = Image.open(self.img_dir + "/" + img_name)
+    img = img.resize((1024, 768), Image.LANCZOS)
     canvas = ImageDraw.Draw(img)
     canvas.text((0,0), img_name, fill='black')
     self.tk_img = ImageTk.PhotoImage(img)
