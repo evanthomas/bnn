@@ -9,7 +9,7 @@ from label_db import LabelDB
 import re
 
 class LabelUI():
-  def __init__(self, label_db_filename, img_dir, sort=True):
+  def __init__(self, label_db_filename, img_dir, width, height, sort=True):
 
     # what images to review?
     # note: drop trailing / in dir name (if present)
@@ -36,10 +36,13 @@ class LabelUI():
     print("UP     toggle labels")
     root.bind('N', self.display_next_unlabelled_image)
     print("N   next image with 0 labels")
+    root.bind('Q', self.quit)
+    print("Q   quit")
     self.canvas = tk.Canvas(root, cursor='tcross')
-    self.canvas.config(width=1024, height=768)
+    self.canvas.config(width=width, height=height)
     self.canvas.bind('<Button-1>', self.add_bee_event)  # left mouse button
     self.canvas.bind('<Button-3>', self.remove_closest_bee_event)  # right mouse button
+
     self.canvas.pack()
 
     # A lookup table from bee x,y to any rectangles that have been drawn
@@ -55,6 +58,9 @@ class LabelUI():
     self.file_idx = 0
     self.display_new_image()
     root.mainloop()
+
+  def quit(self, e):
+        exit()
 
   def add_bee_event(self, e):
     if not self.bees_on:
@@ -142,10 +148,11 @@ class LabelUI():
   def display_new_image(self):
     img_name = self.files[self.file_idx]
     # Display image (with filename added)
+    title = img_name + " " + str(self.file_idx) + " of " + str(len(self.files)-1)
     img = Image.open(self.img_dir + "/" + img_name)
     img = img.resize((1024, 768), Image.LANCZOS)
     canvas = ImageDraw.Draw(img)
-    canvas.text((0,0), img_name, fill='black')
+    canvas.text((0,0), title, fill='black')
     self.tk_img = ImageTk.PhotoImage(img)
     self.canvas.create_image(0,0, image=self.tk_img, anchor=tk.NW)
     # Look up any existing bees in DB for this image.
@@ -158,7 +165,9 @@ import argparse
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--image-dir', type=str, required=True)
 parser.add_argument('--label-db', type=str, required=True)
+parser.add_argument('--width', type=int, default=768, help='input image width')
+parser.add_argument('--height', type=int, default=1024, help='input image height')
 parser.add_argument('--no-sort', action='store_true')
 opts = parser.parse_args()
 
-LabelUI(opts.label_db, opts.image_dir, sort=not opts.no_sort)
+LabelUI(opts.label_db, opts.image_dir, opts.width, opts.height, sort=not opts.no_sort)
