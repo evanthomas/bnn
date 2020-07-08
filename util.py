@@ -89,7 +89,7 @@ def centroids_of_connected_components(bitmap, threshold=0.05, rescale=1.0):
   # return centroids
   centroids = []
   for region in measure.regionprops(all_labels):
-    cx, cy = map(lambda p: int(p*rescale), region.centroid)
+    cx, cy, _ = map(lambda p: int(p*rescale), region.centroid)
     centroids.append((cx, cy))
   return centroids
 
